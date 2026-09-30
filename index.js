@@ -56,8 +56,8 @@ async function getAccessToken() {
  */
 async function sendMessage(token, messageText) {
     // Địa chỉ API gửi tin nhắn của LINE WORKS API 2.0
-    const url = `https://worksapis.com{BOT_ID}/users/${USER_ID}/messages`;
-
+    const url = `https://worksapis.com${BOT_ID}/users/${USER_ID}/messages`; 
+    
     const data = {
         content: {
             type: "text",
