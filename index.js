@@ -10,6 +10,8 @@ app.get('/', (req, res) => {
 
 // Đường dẫn nhận tin nhắn từ LINE WORKS (Callback URL)
 app.post('/callback', (req, res) => {
+
+    console.log(`Có tin nhắn mới `);
     const events = req.body.events;
     
     if (events && events.length > 0) {
