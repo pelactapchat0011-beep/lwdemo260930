@@ -2,6 +2,12 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+// サーバー起動確認
+server.get('/', (req, res) => {
+    console.log(`Hello World!`);
+    res.send('Hello World!');
+});
+
 // Đường dẫn nhận tin nhắn từ LINE WORKS (Callback URL)
 app.post('/callback', (req, res) => {
     const events = req.body.events;
