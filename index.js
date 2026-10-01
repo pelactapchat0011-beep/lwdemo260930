@@ -42,8 +42,10 @@ async function getAccessToken() {
         const response = await axios.post(tokenUrl, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
-
+        
+        console.log(response.data);
         console.log("👉 Lấy Token thành công!");
+        
         return response.data.access_token; // Trả về chuỗi Token dài để sử dụng
     } catch (error) {
         console.error("❌ Lỗi khi lấy Token:", error.response ? error.response.data : error.message);
@@ -89,6 +91,8 @@ async function main() {
         // 1. Thực hiện lấy token trước
         const token = await getAccessToken();
         
+        console.log("ACCESS TOKEN =", token);
+
         // 2. Có token rồi, truyền token vào để gửi tin nhắn
         await sendMessage(token, "Xin chào! Đây là tin nhắn tự động từ Bot của bạn. 🤖");
         
@@ -119,7 +123,7 @@ app.post('/callback', (req, res) => {
 
         // TODO: Gọi API phản hồi tại đây
     }
-    
+
     main();
     // 4. Luôn luôn trả về 200 OK cho LINE WORKS biết hệ thống của bạn đã nhận được tin
     res.sendStatus(200);
