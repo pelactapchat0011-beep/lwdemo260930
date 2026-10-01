@@ -17,9 +17,6 @@ const PRIVATE_KEY = fs.readFileSync(keyPath, 'utf8');
 const BOT_ID = "13278086"; // ID của con Bot bạn đã tạo
 const USER_ID = "stgr-line4@systemgear"; // ID tài khoản LINE WORKS của người n
 
-const axios = require("axios");
-const jwt = require("jsonwebtoken");
-
 async function getAccessToken() {
     const now = Math.floor(Date.now() / 1000);
 
