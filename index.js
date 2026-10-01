@@ -71,6 +71,9 @@ async function sendMessage(token, messageText) {
             'Authorization': `Bearer ${token}` // Truyền Token vào Header chỉnh chu
         }
     };
+    
+    console.log(token);
+    console.log(`Bearer ${token}`);
 
     try {
         const response = await axios.post(url, data, config);
