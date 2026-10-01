@@ -85,6 +85,20 @@ async function sendMessage(token, messageText) {
 }
 async function main() {
 
+    try {
+        // 1. Thực hiện lấy token trước
+        const token = await getAccessToken();
+        
+        // 2. Có token rồi, truyền token vào để gửi tin nhắn
+        await sendMessage(token, "Xin chào! Đây là tin nhắn tự động từ Bot của bạn. 🤖");
+        
+    } catch (error) {
+        console.error("Quy trình thất bại.");
+    }
+}
+// Đường dẫn nhận tin nhắn từ LINE WORKS (Callback URL)
+app.post('/callback', (req, res) => {
+    
     // 1. Log toàn bộ dữ liệu nhận được để bạn dễ dàng debug trong tab Logs của Render
     console.log("Dữ liệu nhận từ LINE WORKS:", JSON.stringify(req.body));
 
@@ -105,19 +119,7 @@ async function main() {
 
         // TODO: Gọi API phản hồi tại đây
     }
-    try {
-        // 1. Thực hiện lấy token trước
-        const token = await getAccessToken();
-        
-        // 2. Có token rồi, truyền token vào để gửi tin nhắn
-        await sendMessage(token, "Xin chào! Đây là tin nhắn tự động từ Bot của bạn. 🤖");
-        
-    } catch (error) {
-        console.error("Quy trình thất bại.");
-    }
-}
-// Đường dẫn nhận tin nhắn từ LINE WORKS (Callback URL)
-app.post('/callback', (req, res) => {
+    
     main();
     // 4. Luôn luôn trả về 200 OK cho LINE WORKS biết hệ thống của bạn đã nhận được tin
     res.sendStatus(200);
