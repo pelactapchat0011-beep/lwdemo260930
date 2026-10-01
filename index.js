@@ -17,43 +17,100 @@ const PRIVATE_KEY = fs.readFileSync(keyPath, 'utf8');
 const BOT_ID = "13278086"; // ID của con Bot bạn đã tạo
 const USER_ID = "stgr-line4@systemgear"; // ID tài khoản LINE WORKS của người n
 
-async function getAccessToken() {
-    const currentTime = Math.floor(Date.now() / 1000);
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
 
-    // 1. Tạo Payload cho mã JWT
+async function getAccessToken() {
+    const now = Math.floor(Date.now() / 1000);
+
+    // JWT Payload
     const payload = {
         iss: CLIENT_ID,
         sub: SERVICE_ACCOUNT,
-        iat: currentTime,
-        exp: currentTime + 3600 // Token có thời hạn tối đa 1 tiếng
+        iat: now,
+        exp: now + 3600
     };
 
-    // 2. Ký mã JWT bằng thuật toán RS256 và Private Key
-    const assertion = jwt.sign(payload, PRIVATE_KEY, { algorithm: 'RS256' });
+    // Tạo JWT
+    const assertion = jwt.sign(
+        payload,
+        PRIVATE_KEY,
+        {
+            algorithm: "RS256"
+        }
+    );
 
-    // 3. Gửi JWT lên LINE WORKS để đổi lấy Access Token chính thức
-    const tokenUrl = 'https://auth.worksmobile.com/oauth2/v2.0/token';
-    
     const params = new URLSearchParams();
-    params.append('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
-    params.append('assertion', assertion);
+    params.append(
+        "grant_type",
+        "urn:ietf:params:oauth:grant-type:jwt-bearer"
+    );
+    params.append("assertion", assertion);
 
     try {
-        const response = await axios.post(tokenUrl, params, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        console.log("CLIENT_ID =", CLIENT_ID);
-        console.log("SERVICE_ACCOUNT =", SERVICE_ACCOUNT);
-        console.log("PRIVATE_KEY =", PRIVATE_KEY ? "OK" : "NG");
-        console.log("response =",response.data);
-        console.log("👉 Lấy Token thành công!");
-        
-        return response.data.access_token; // Trả về chuỗi Token dài để sử dụng
+        const response = await axios.post(
+            "https://auth.worksmobile.com/oauth2/v2.0/token",
+            params,
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            }
+        );
+
+        console.log("Token取得成功");
+        console.log(response.data);
+
+        return response.data.access_token;
+
     } catch (error) {
-        console.error("❌ Lỗi khi lấy Token:", error.response ? error.response.data : error.message);
+
+        console.error(
+            "Token取得失敗",
+            error.response?.data || error.message
+        );
+
         throw error;
     }
 }
+
+// async function getAccessToken() {
+//     const currentTime = Math.floor(Date.now() / 1000);
+
+//     // 1. Tạo Payload cho mã JWT
+//     const payload = {
+//         iss: CLIENT_ID,
+//         sub: SERVICE_ACCOUNT,
+//         iat: currentTime,
+//         exp: currentTime + 3600 // Token có thời hạn tối đa 1 tiếng
+//     };
+
+//     // 2. Ký mã JWT bằng thuật toán RS256 và Private Key
+//     const assertion = jwt.sign(payload, PRIVATE_KEY, { algorithm: 'RS256' });
+
+//     // 3. Gửi JWT lên LINE WORKS để đổi lấy Access Token chính thức
+//     const tokenUrl = 'https://auth.worksmobile.com/oauth2/v2.0/token';
+    
+//     const params = new URLSearchParams();
+//     params.append('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
+//     params.append('assertion', assertion);
+
+//     try {
+//         const response = await axios.post(tokenUrl, params, {
+//             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+//         });
+//         console.log("CLIENT_ID =", CLIENT_ID);
+//         console.log("SERVICE_ACCOUNT =", SERVICE_ACCOUNT);
+//         console.log("PRIVATE_KEY =", PRIVATE_KEY ? "OK" : "NG");
+//         console.log("response =",response.data);
+//         console.log("👉 Lấy Token thành công!");
+        
+//         return response.data.access_token; // Trả về chuỗi Token dài để sử dụng
+//     } catch (error) {
+//         console.error("❌ Lỗi khi lấy Token:", error.response ? error.response.data : error.message);
+//         throw error;
+//     }
+// }
 
 /**
  * BƯỚC 2: HÀM SỬ DỤNG TOKEN ĐỂ GỬI TIN NHẮN
@@ -92,7 +149,6 @@ async function main() {
     try {
         // 1. Thực hiện lấy token trước
         const token = await getAccessToken();
-        
         console.log("ACCESS TOKEN =", token);
 
         // 2. Có token rồi, truyền token vào để gửi tin nhắn
@@ -121,12 +177,12 @@ app.post('/callback', (req, res) => {
         const userId = event.source?.userId || event.user; // ID người nhắn
         const userMessage = event.content.text;           // Nội dung tin nhắn text
 
-        console.log(`Nhận được tin nhắn từ ${userId}: ${userMessage}`);
+        //console.log(`Nhận được tin nhắn từ ${userId}: ${userMessage}`);
 
-        // TODO: Gọi API phản hồi tại đây
     }
 
     main();
+
     // 4. Luôn luôn trả về 200 OK cho LINE WORKS biết hệ thống của bạn đã nhận được tin
     res.sendStatus(200);
 });
