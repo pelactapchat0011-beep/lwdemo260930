@@ -32,7 +32,7 @@ async function getAccessToken() {
     const assertion = jwt.sign(payload, PRIVATE_KEY, { algorithm: 'RS256' });
 
     // 3. Gửi JWT lên LINE WORKS để đổi lấy Access Token chính thức
-    const tokenUrl = 'https://worksmobile.com';
+    const tokenUrl = 'https://auth.worksmobile.com/oauth2/v2.0/token';
     
     const params = new URLSearchParams();
     params.append('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
@@ -42,8 +42,10 @@ async function getAccessToken() {
         const response = await axios.post(tokenUrl, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
-        
-        console.log(response.data);
+        console.log("CLIENT_ID =", CLIENT_ID);
+        console.log("SERVICE_ACCOUNT =", SERVICE_ACCOUNT);
+        console.log("PRIVATE_KEY =", PRIVATE_KEY ? "OK" : "NG");
+        console.log("response =",response.data);
         console.log("👉 Lấy Token thành công!");
         
         return response.data.access_token; // Trả về chuỗi Token dài để sử dụng
